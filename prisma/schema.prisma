@@ -11,12 +11,45 @@ enum Role {
   USER
   SERVICE_PROVIDER
 }
+enum ServiceType {
+  MEDICAL
+  HOUSE_HELP
+  BEAUTY
+  FITNESS
+  EDUCATION
+  OTHER
+}
+
+enum AppointmentStatus {
+  BOOKED
+  CANCELLED
+}
+
 
 model User {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
+  id   String        @id @default(uuid())
+  name     String
+  email       String        @unique
   passwordHash String
-  role         Role
-  createdAt    DateTime      @default(now())
+  role        Role
+  createdAt   DateTime      @default(now())
+  
+  providedServices Service[]      @relation("ServiceProvider") 
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Service {
+  id   String         @id @default(uuid())
+  name   String
+  type          ServiceType
+  providerId      String
+  durationMinutes Int
+  createdAt       DateTime       @default(now())
+  
+  provider        User           @relation("ServiceProvider", fields: [providerId], references: [id], onDelete: Cascade)
+  
+  @@index([providerId])
+  @@index([type])
 }
