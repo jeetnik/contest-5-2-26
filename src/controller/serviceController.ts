@@ -1,6 +1,6 @@
 import type {Response } from "express";
 import type { AuthRequest } from "../utils/types";
-import { createServiceSchema } from "../utils/validation";
+import { createServiceSchema, setAvailabilitySchema } from "../utils/validation";
 import { prisma } from "../../db";
 
 
@@ -42,7 +42,7 @@ export async function createService(req: AuthRequest, res: Response) {
     }
 }
 
-export async function setService(req:AuthRequest,res:Response){
+export async function setAvailability (req:AuthRequest,res:Response){
     try{
         if (!req.user) {
             res.status(401).json({ error: "Unauthorized" });
@@ -54,10 +54,36 @@ export async function setService(req:AuthRequest,res:Response){
             res.status(403).json({ error: "Forbidden - Only service providers can set availability" });
             return;
         }
+
+  
+        const { serviceId } = req.params;
+
+    //corret the fzod validation of data
+        const validatedData = setAvailabilitySchema.parse(req.body);
+
+    
+        const service = await prisma.service.findUnique({
+            where: { id: serviceId },
+        });
+
+        if (!service) {
+            res.status(404).json({ error: "Service not found" });
+            return;
+        }
+
+        if (service.providerId !== req.user.id) {
+            res.status(403).json({ message: " for your own services" });
+            return;
+        }
+
+    
+
         
       
     }catch(e){
-
+return res.status(400).json({
+    message:"Internal server error"
+})
 
     }
 }

@@ -27,8 +27,8 @@ const isValid=(t:string)=>{
 const [h:m]=t.split(":").arr
 
 }
-export const setService=z.object({
-  dayOfWeek: z.number().min(0).max(6),
+export const setAvailabilitySchema=z.object({
+  dayOfWeek: z.number().min(0,"least 0").max(6,"not a vaild day"),
   startTime:z.string.isValid()
   endTime:
 })
